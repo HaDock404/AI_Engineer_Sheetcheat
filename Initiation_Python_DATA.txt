@@ -1,0 +1,450 @@
+Ouverture du notebook:
+	taper la ligne de commande Jupyter Notebook
+
+Commenter le code:
+	# Un titre de niveau 1
+	Voici un peu de texte pour présenter un markdown
+	## titre de niveau 2
+	**Ceci** est très important
+	## autre titre de niveau 2
+	Mais *cela* également !
+
+Déclaration de variable:
+	on écrit simple le nom de la variable que l'on crée avec un = et une valeur
+
+
+Opération classique possible:
+	+addition -soustraction *multiplication /division %modulo **puissance //division entière(chiffre arrondi à l'inférieur)
+
+Type de variable en Python:
+	nombre: int 
+	décimal: float 
+	caractère: string
+
+Conversion de variable:
+	int(variable)
+	float(variable)
+	str(variable)
+
+Exemple de conversion de valeur:
+	a = 14.0
+	# a est un float
+	a = int(a)
+	print(a)
+	# a est à présent un entier : il affiche 14 et non plus 14.0
+
+Exemple de concaténation de variable:
+	villeFavoriteUne = "Reims"
+	villeFavoriteDeux = "Strasbourg"
+	favoris = "Mes villes favorites sont " + villeFavoriteUne + " et " + villeFavoriteDeux 
+	print(favoris) # -> "Mes villes favorites sont Reims et Strasbourg"
+
+Exemple de fonction:
+	a = 'pomme'
+	b - 5
+	c = 2
+	print(len(a))
+	5
+	print(type(a))
+	<class 'str'>
+	print(pow(a, b)) #calcul de puissance
+	25
+	print(abs(-100)) #valeur absolue d'un nombre
+	100
+
+Ecrire ses propres fonction:
+	def afficherPerimetre():
+    		cote1 = 6
+    		cote2 = 4
+    		cote3 = 3
+    		perimetre = cote1 + cote2 + cote3
+    		print(perimetre)
+    
+	afficherPerimetre() # => 13
+
+Avec des paramètres:
+	def afficherPerimetre(cote1, cote2, cote3):
+    		perimetre = cote1 + cote2 + cote3
+    		print(perimetre)
+
+	afficherPerimetre(10, 11, 4) # => 25
+	afficherPerimetre(2, 2, 3.5) # => 7.5
+
+
+Valeur retourné:
+	Permet d'utiliser une valeur défini dans une fonction autant de fois que nécessaire
+
+	def calculPerimetre(cote1, cote2, cote3):
+   		 perimetre = cote1 + cote2 + cote3
+    		return perimetre
+
+	perimetre1 = calculPerimetre(6, 4, 3)
+	perimetre2 = calculPerimetre(10, 3, 11)
+
+	print("Le périmetre de mon premier triangle est", perimetre1, "et celle de mon second est", 			perimetre2)
+
+Aide:
+	fonction help permet d'afficher la documentation de la fonction
+	help(pow)
+
+Les méthodes: 
+	nomVariable.méthode()
+	#les méthodes peuvent prendre des paramètres 
+
+	texte - 'voici un EXEMPLE avec une STRING'
+	a = texte.upper() #on affecte la modification à une variable sans modifier la variable initiale
+	
+	print(a) # -> VOICI UN EXEMPLE AVEC UNE STRING
+	print(texte.capitalize()) # -> Voici un exemple avec une string
+	print(texte.replace('EXEMPLE', 'essai')) # -> voici un essai avec une string
+	print(texte.find('un')) # -> 6 (caractère)
+	print(texte.find('deux')) # -> -1
+
+Création de tableau:
+	nomClient = ['Georges Dupont', 'Luc Martin', 'Lucas Anderson', 'Alexandre Petit']
+
+Assigner valeur dans le tableau:
+	# assigner la valeur 'Georges Dupond' au premier nom dans notre liste
+	# c'est donc l'indice 0, car les indices commencent à 0 en python !
+	# on remplace la première valeur par une autre
+	nomClient[0] = 'Georges Dupond'
+
+Accéder aux valeurs:
+	# afficher le premier élément
+	print(nomClient[0])
+
+	# afficher le dernier élément
+	print(nomClient[-1])
+
+	# accéder du second élément au 3ème
+	print(nomClient[1:3])
+
+	# accéder à tous les éléments du début jusqu'au second
+	print(nomClient[:2])
+
+Stockage de tableau dans des tableaux:
+	listeEtrange = [4, 10.2, "Georges Dupond", ["une autre liste", 1]]
+
+Ajouter des éléments à une liste: 
+	liste = []
+	liste.append(7)
+	liste.append(5)
+	print(liste) # => [7, 5]
+
+Autres méthodes sur les tableaux:
+	liste = []
+	liste.append(7) # -> [7]
+	liste.append(5) # -> [7, 5]
+	liste.insert(1,12) # [7, 12, 5]
+	liste[0] = 4 # -> [4, 12, 5]
+	liste.remove(12) # [4, 5]
+	liste.index(5) # affiche 1
+	liste.extend([1, 2, 3]) # [4, 5, 1, 2, 3]
+	del liste[3] # [4, 5, 1, 3]
+
+Création de dictionnaire:
+	comptes = {"Georges Dupont": 10000, "Luc Martin": 150, "Lucas Anderson": 300, "Alexandre Petit": 			1800.74}
+	print(comptes["Luc Martin"]) # -> 150
+
+Manipulation de dictionnaire:
+	comptes['Georges Dupont'] -= 2000 # je soustrais 2000 au compte de Georges
+	comptes['Cyril Andreje'] = 1000 # j'ajoute un nouvel individu dans mon dictionnaire
+	print(comptes['Cyril Andreje']) # j'affiche la valeur du compte de Cyril
+	comptes.pop('Luc Martin') # supprime Luc Martin de notre dictionnaire
+
+Déclaration de tuple:
+	#les tuiles sont des objets ordonnées. On peut donc utiliser les indices 
+		pour sélectionner les éléments d'un tuple
+
+	mon_tuple = (1, 2, 3, 'a', 'b')
+	print(mon_tuple[1]) # -> 2
+	print(mon_tuple[4]) # -> 'b'
+	
+	#on peut également déclarer plusieurs variables en même temps à partir d'un tuple:
+		a, b = (1, 'pomme')
+		print(a) # -> 1
+		print(b) # -> 'pomme'
+
+	on ne peut pas faire de modification dans un tuple
+
+Structure conditionnelle: 
+	nom = input('Quel est ton nom, cher(e) inconnu(e) ?')
+
+	if len(nom) > 0:
+    		print("Hello", nom, "!")
+	else:
+    		print("Hello World !")
+
+Booléen:
+	ceCoursEstGenial = True
+	sonAuteurEstTresHumble = False
+
+Opérateur de comparaison:
+	== égale
+	!= différent de 
+	< inférieur à
+	> supérieur à
+	<= inférieur ou égal
+	>= supérieur ou égal
+	2 == 2 # -> True
+	2 == 3 # -> False
+	4 != 4 # -> False
+	4!= 5 # -> True
+	1 < 2 # -> True
+	1 < 1 # -> False
+	1 <= 1 # -> True
+	3 > 4 # -> False
+	5 > 4 # -> True
+	5 >= 4 # -> True
+
+Opérateur logique:
+	and: ET
+	or: OU
+	not: N'EST PAS
+	True and True # True
+	True and False # False
+	False and False # False
+	True or False # True
+	True or True # True
+	False or False # False
+	not(True) # False
+	not(False) # True
+	True and True and True # True
+	True and True and False # False
+	True or False or False # True
+	False or False or False # False
+	False or True and True # True
+	not(False) and True or False # True
+	(True and False) or True # True
+	not(True and False or not(True)) # True
+
+L'opérateur in:
+	renvoi True ou False suivant si la valeur est trouvé dans la séquence
+	
+	maListe = [4, 2, 3, 2, 10]
+	maListeDeString = ["a", "b", "c", "d"]
+	monString = "La météo est vraiment bien aujourd'hui !"
+
+	4 in maListe # True
+	0 in maListe # False
+	0 in maListeDeString # False
+	"c" in maListeDeString # True
+	"e" in maListeDeString # False
+	"météo" in monString # True
+	"vraiment" in monString # True
+	"pluie ?" in monString # False
+
+Enchainement de condition:
+	if condition1: 
+    		# instructions
+	elif condition2:
+    		# instructions
+	else:
+    		# instructions
+
+	
+	compte = input("Quel est le soldes de votre compte ?")
+	compte = int(compte) # transformer la réponse en entier
+
+	if compte >= 10000:
+    		print("Prêt accordé !")
+	elif compte >= 100 and compte < 10000:
+    		print("Prêt en cours de validation : à l'étude")
+	else:
+    		print("Prêt refusé")
+
+Boucle FOR:
+	myList = [7, 2, 4, 10]
+
+	for elt in myList:
+		print(elt)
+
+	# -> 7
+	# -> 2
+	# -> 4
+	# -> 10
+
+Boucle For via une valeur itérative entière:
+	range(début, fin, pas)
+
+	for i in range(0, 5, 1):
+    		print(i) # -> affiche de 0 à 4 par pas de 1 (fin - 1)
+    
+	for i in range(0, 5):
+    		print(i) # -> affiche de 0 à 4 également (le pas par défaut est 1)
+    
+	for i in range(5):
+    		print(i) # -> affiche de 0 à 4 également (le début par défaut est 0)
+
+	for i in range(0, 5, 2):
+    		print(i) # -> affiche 0, 2 puis 4
+
+Boucle WHILE:
+	while expressionLogique:
+    		# bloc à exécuter
+
+	nombreArbres = 0
+
+	while nombreArbres < 10:
+    		nombreArbres += 1
+    		print("J'ai planté", nombreArbres, "arbres")
+    
+	print("J'ai une chouette forêt !")
+
+	# -> J'ai planté 1 arbres
+	# -> J'ai planté 2 arbres
+	# -> J'ai planté 3 arbres
+	# -> J'ai planté 4 arbres
+	# -> J'ai planté 5 arbres
+	# -> J'ai planté 6 arbres
+	# -> J'ai planté 7 arbres
+	# -> J'ai planté 8 arbres
+	# -> J'ai planté 9 arbres
+	# -> J'ai planté 10 arbres
+	# -> J'ai une chouette forêt !
+
+Instruction dans une boucle:
+	for i in range(10):
+    		# instructions réalisées à chaque itération
+    		print(i)
+    		if (i == 2) or (i == 5):
+        		print("Cas spécial")
+        		continue #permet de sauter le reste de l'itération et de passer à la suivante
+    		# instructions non exécutées si i == 2 or 5 
+    		print("i != 2 & i != 5")
+
+	# -> 0
+	# -> i != 2 & i != 5
+	# -> 1
+	# -> i != 2 & i != 5
+	# -> Cas spécial
+	# -> 3
+	# -> i != 2 & i != 5
+	# -> 4
+	# -> i != 2 & i != 5
+	# -> Cas spécial
+	# -> 6
+	# -> i != 2 & i != 5
+	# -> 7
+	# -> i != 2 & i != 5
+	# -> 8
+	# -> i != 2 & i != 5
+	# -> 9
+	# -> i != 2 & i != 5
+
+
+	panier = ["pomme", "orange", "banane"]
+
+	for fruit in panier:
+    		if fruit == "orange":
+        		print("J'ai une", fruit, "!")
+        		break #permet d'arrêter la boucle
+
+Création et utilisation de module:
+
+	'''
+	Module geometry.py
+	'''
+	# variables
+	pi = 3.14159265359
+	phi = 1.6180
+
+	# fonction qui calcule l'aire
+	def aire(obj):
+    		if type(obj) == carre:
+        		return obj.a**2
+
+	# definitions de quelques classes
+	class carre(object):
+    		def __init__(self,a):
+        		self.a = a
+
+	class triangle(object):
+    		def __init__(self,a,b,c):
+        		self.a = a
+        		self.b = b
+        		self.c = c
+	
+	
+	#import du module dans un projet
+
+	import geometry
+	
+	car = geometry.carre(4)
+	tri = geometry.triangle(3, 6, 5)
+
+	print(geometry.pi) # -> 3.14159265359
+
+	geometry.aire(car) # -> 16
+
+
+	#on peut donner un alias au module pour raccourcir le nom
+	import geometry as geo # on peut maintenant accéder à geo.aire() ou geo.pi
+
+	#on peut import des fonctions spécifiques du module pour les utiliser facilement
+	from geometry import pi
+	print(pi) # -> 3.14159265359 
+
+	#on peut importer toutes les fonction
+	from geometry import *
+
+Utilisation de package:
+	import geometry # import all the geometry package
+
+	print(geometry.variables.pi) # -> 3.1415...
+	car = geometry.classes.carre(4)
+	geometry.fonctions.aire(car) # -> 16
+
+	#import d'un seul module du package
+	import geometry.variables as var #importer uniquement ce qui est défini dans variables.py
+
+	print(var.pi) # -> 3.1415...
+
+Générer des nombres aléatoires:
+	import random
+
+	for i in range(3):
+		print(random.random())
+	
+	# -> 0.9569696
+	# -> 0.3956969
+	# -> 0.4956969
+	
+	print ('Exemple de la fonction uniform :')
+	for i in range(3):
+		print(random.uniform(5, 10)) #génère un float aléatoire compris entre a et b
+
+	print('Exemple de la fonction randint:')
+	for i in range(3):
+		print(random.randint(5, 10)) #génère un int aléatoire compris entre a et b
+
+	print ('Exemple de la fonction gauss')
+	for I in range(10):
+		print(random.gauss(0, 1)) #loi normal centré en zéro avec un écart type de 1
+
+	print('Exemple choix aléatoire permis un liste: sous-échantillonnage ')
+	liste = ['one', 'two', 'three', 'four', 'five']
+	for i in range(3):
+		print(random.choice(liste))
+	
+	# -> one
+	# -> four
+	# -> three
+
+	print(random.choices(liste, k=2)) #échantillonnage avec remise (on remet dans la liste)
+	print(random.choices(liste, k=3))
+
+	# -> ['five', 'three']
+	# -> ['two', 'one', 'two']
+
+	print(random.sample(liste, 2)) #échantillonnage sans-remise (on remet pas dans la liste)
+	print(random.sample(liste, 3))
+	
+	# -> ['two', 'one']
+	# -> ['one', 'three', 'two']
+
+
+
+
+
+
