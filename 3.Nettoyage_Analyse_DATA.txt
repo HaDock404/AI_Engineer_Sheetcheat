@@ -1,0 +1,503 @@
+
+
+Différentes variables:
+	
+	Variables quantitatives: 
+		valeur numérique
+		- discrète : pas beaucoup de valeur
+		- continue : énormément de valeur
+
+	Variables qualitatives:
+		modalité, code, mot ou phrase, aucune opération arithmétique possible
+		- nominale : valeurs ne peuvent pas être ordonnées
+		- ordinale : valeurs peuvent être ordonnées (petit, moyen, grand)
+
+	Variable dichotomique :
+		variable binaire, booléennes, 0/1, oui/non, true/false
+
+##Détection d'erreur:
+	
+	#on commence par importer les librairies nécessaire et le fichier
+	import pandas as pd
+	import numpy as np
+	import re
+
+	#chargement et affichage des données
+	data = pd.read_csv('fichier.csv')
+	print(data)
+
+	#on regarde si il y a des valeurs manquantes 
+	print(data.isnull().sum()) #permet de voir la colonne ou il y a des valeurs manquantes
+
+	#on regarde si il y a des doublons
+	data.loc[data['colonne'].duplicated(keep=False),:]
+
+	#Exemple d'utilisation d'un mask
+	VALID_COUNTRIES = ['France', 'Côte d\'ivoire', 'Madagascar', 'Bénin', 'Allemagne'
+				, 'USA']
+
+	mask = ~data['pays'].isin(VALID_COUNTRIES) #le symbole ~(option+n) permet d'inverser la condition
+	data.loc[mask, 'pays'] = np.NaN #mettra NaN si ne se trouve pas dans VALID_COUNTRIES
+
+	#supprimer des informations séparés par une virgule
+	#n=1 correspond au nombre de séparation
+	#expand=True permet de ranger dans un tableau les différentes séparations
+	# [0] permet de garder la première séparation
+	data['colonne'] = data['colonne'].str.split(',', n=1, expand=True)[0]
+
+	
+	#on peut supprimer tous les derniers caractères d'une colonne qui ne correspond pas au format
+	data['colonne'] = data['colonne'].str[:-1]
+
+	#on peut forcer la conversion de valeur en nombre 
+	#errors=coerce permet de remplacer les erreur pas NaN
+	data['colonne'] = pd.to_numeric(data['colonne'], errors='coerce')
+
+
+	#on peut remplacer les valeurs manquantes NaN par la moyenne de toutes les autres
+	data.loc[data['colonne'].isnull(), 'colonne'] = data['colonne'].mean()
+
+	#on peut formater toutes une colonne en date propre
+	data['colonne_date'] = pd.to_datetime(data['colonne_date'], 
+					format='%d/%m/%Y', errors='coerce')
+
+
+##Distribution empirique:
+
+	Au lieu de représenter un échantillon de 1000 valeurs qualitative on le catégorise
+	500 bleu, 250 blanc, 250 rouge, on appelle ça DISTRIBUTION EMPIRIQUE
+	On peut également représenter leur FREQUENCE d'apparition, leur %
+
+	#On peut représenter cette fréquence sous forme de camembert
+	data["colonne"].value_counts(normalize=True).plot(kind='pie')
+	#Cette ligne assure que le pie chart est un cercle plutôt qu'une ellipse
+	plt.axis('equal') 
+	plt.show() #Affiche le graphique
+
+	#On peut représenter cette fréquence sous forme de barchart
+	data["colonne"].value_counts(normalize=True).plot(kind='bar')
+	plt.show()
+
+
+	#On peut représenter une valeur qualitative par rapport à sa valeur dans le mois
+	#on crée un variable quart_mois que l'on divise en 4
+	data['quart_mois'] = [int((jour-1)*4/31)+1 for jour in data["colonne_quantitative"].dt.day]
+	#On affiche sa distribution en baton avec une largeur faible pour les qualitatifs
+	data["quart_mois"].value_counts(normalize=True).plot(kind='bar',width=0.1)
+	plt.show()
+	
+
+	#Pour les variables quantitative continues on regroupe les valeurs dans des classes
+	#Le fait d'agréger une variable s'appelle la discrétisation (binning, bucketing)
+	#on rassemble des valeurs d'une même classe ensemble dans un histogramme
+	data["colonne"].hist(density=True)
+	plt.show()
+
+	#Histogramme plus beau en jouant sur la valeur absolu de différence entre classe
+	data[data.colonne.abs() < 100]["colonne"].hist(density=True,bins=20)
+	plt.show()
+	#IMPORTANT règle de Sturges donne le nombre optimal de classe
+	# k = [1 + log2(n)] où n est la taille de l'échantillon
+
+
+	#on peut représenter la distribution empirique des valeurs sous forme de tableau
+	effectifs = data["quart_mois"].value_counts() #renvoi un object series
+	modalites = effectifs.index #l'index de effectifs contient les modalités
+
+	tab = pd.DataFrame(modalites, columns = ["quart_mois"]) #création du tableau 
+	#à partir des modalités
+	tab["n"] = effectifs.values #on ajoute les différents effectifs pour les différents quarts
+	#on affiche la fréquence en % de chaque effectif
+	tab["f"] = tab["n"] / len(data) #len(data) renvoie la taille de l'échantillon
+	#on calcule la fréquence cumulé
+	tab = tab.sort_values("quart_mois") #tri des valeurs de la variable X (croissant)
+	tab["F"] = tab["f"].cumsum() #cumsum calcule la somme cumulée
+
+
+##Analyse univariée :
+
+	C'est une analyse effectuée sur une variable à la fois.
+	Exemple, étude de la répartition d'âge, performance d'étudiant sur la réussite globale.
+
+	Un indice statistique, est une statistique construite à partir d'une certaine vision, 
+	à partir de connaissances d'un domaine.
+
+	Un indicateur qui est une statistique plus neutre, construite sans à-priori 
+	et sans intention derrière
+
+
+Mesure de tendance centrale: 
+
+	Les mesures de tendance centrale permettent d'avoir une idée de la valeur autour de laquelle
+	se concentre l'ensemble de nos valeurs
+
+
+	Le mode est la modalité ou la valeur la plus fréquente
+	Le mode est appliqué sur les variables qualitative et quantitatives discrètes
+	Pour les variables quantitative continues on regroupe les valeurs par classe, on agrège
+	Lorsque qu'il y a qu'un seul pique de distribution du mode on parle de distribution unimodale
+	Sinon de distribution bimodale ou plurimodale
+	#en Python
+	data['colonne'].mode()
+
+
+	La moyenne est la valeur correspondant au centre de gravité de l'ensemble des 
+	valeurs d'une variable quantitative
+	#en Python
+	data['colonne'].mean()
+
+	
+	La médiane est la valeur telle que le nombre d'observations supérieurs à cette valeur est
+	égal au nombre d'observation inférieures à cette valeur.
+	La médiane permet de palier au outlier que peut avoir la moyenne 
+	#en Python
+	data['colonne'].median()
+
+
+Mesure de dispersion:
+
+	Les mesures de dispersion permettent de compléter les mesures de tendance centrales, 
+	en précisant la façon dont les valeurs se répartissent autour de ces dernières.
+
+	La variance empirique est la somme des différences à la moyenne au carré, divisée par 
+	l'effectif total
+	#en Python
+	data['colonne'].var()
+	
+	La variance empirique sans biais permet de corriger le biais de la variance 
+	#en Python
+	data['colonne'].var(ddof=0)
+
+
+	L'écart-type empirique est la racine carrée de la variance empirique, cela permet 
+	d'avoir une unité de mesure plus simple à utiliser qu'un carré
+	#en Python
+	data['colonne'].std()
+
+	Le coefficient de variation qui est l'écart-type empirique divisé par la moyenne permet de
+	pondérer la variation suivant la taille de l'échantillon
+	#en Python
+	data['colonne'].std()/data['colonne'].mean()
+
+
+	L'écart interquartile est la différence entre le 3e et le 1er quartile IQ = Q3 - Q1
+	cela permet de délimiter la boite à moustaches (boxplot)
+	1/4 des valeurs se trouvent en dessous du 1er quartile et 3/4 en-dessus
+	2/4 se trouvent en dessous du 2e quartile et 2/4 au-dessus (Q2 est la médiane)
+	3/4 se trouvent en dessous du 3e quartile et 1/4 au dessus
+	
+
+	La boite à moustaches (boxplot) permet de représenter schématiquement une distribution 
+	incluant sa dispersion. Elle est délimité par Q1 et Q3, on représente 
+	la médiane à l'intérieur de la boite
+	Les moustaches permettent de délimiter la valeur minimale et maximale à conditions que chacune
+	d'elles ne mesure pas plus de 1,5 fois l'écart inter-quartile (IQ = Q3 - Q1).
+	Sinon les valeurs au dessus seront alors considérées comme des outliers.
+	#en Python
+	data.boxplot(column="colonne", vert=False)
+	plt.show()
+
+
+Mesure de forme:
+
+	Les mesures de forme permettent de connaitre la forme de la distribution, l'importance
+	de son étalement peut se faire à gauche ou à droite de la moyenne.
+
+	On utilise le Skewness empirique pour faire une mesure de forme. L'asymétrie traduit la régularité 
+	ou non avec laquelle les observations se répartissent autour de la valeur centrale.
+	y1 = 0 la distribution est symétrique
+	y1 > 0 la distribution est plus petite à droite
+	y1 < 0 la distribution est plus petite à gauche
+	#en Python
+	data['colonne'].skew()
+
+
+	Le Kurtosis empirique est une mesure d'aplatissement, elle ne peut s'interpréter que si la 
+	distribution est symétrique (Skewness -> y1 = 0). On compare l'aplatissement par rapport
+	à la distribution normal (Gauss)
+	On interprète ainsi les résultats:
+	y2 = 0 la distribution à le même aplatissement que la distribution normal
+	y2 > 0 la distribution est plus concentré au milieu
+	y2 < 0 la distribution est plus aplatie
+	#en Python
+	data['colonne'].kurtosis()
+	
+
+Mesure de concentration:
+	
+	La courbe de Lorenz permet de visualiser la concentration des valeurs par rapport aux individus
+	#en Python
+	valeurs = data[data['colonne'] > 0]
+	dep = valeurs['montant'].values
+	n = len(dep)
+	lorenz = np.cumsum(np.sort(dep)) / dep.sum()
+	lorenz = np.append([0],lorenz) # La courbe de Lorenz commence à 0
+
+	#Il y a un segment de taille n pour chaque individu, plus 1 segment supplémentaire d'ordonnée 0. 
+	#Le premier segment commence à 0-1/n, et le dernier termine à 1+1/n.
+	xaxis = np.linspace(0-1/n,1+1/n,n+1) 
+	plt.plot(xaxis,lorenz,drawstyle='steps-post')
+	plt.show()
+
+
+	La médiale de la courbe de Lorenz est la position de l'individu en abscisse 
+	par rapport à 0.5 de l'ordonnée. 50% des individus se trouvent en dessous et 50%
+	au dessus de cette médiale.
+
+
+	L'indice de Gini de la courbe de Lorenz résume la courbe de Lorenz.
+	Il varie de 0 à 1, où 0 représente une égalité parfaite et 1 représente une inégalité
+	maximale.
+	#en Python
+	AUC = (lorenz.sum() -lorenz[-1]/2 -lorenz[0]/2)/n 
+	S = 0.5 - AUC 
+	gini = 2*S
+	gini
+
+
+##Analyse bivariée:
+
+	C'est une analyse menée entre deux variables, elle permet d'établir des recommandations
+	métier pertinentes sur les individus à partir de la compréhension du 
+	comportement d'une variable par rapport à une autre
+	On étudie des variables dans des graphiques à 2 dimensions pour établir des relations
+
+
+Recherche de corrélation:
+	
+	La notion de relation entre variables est appelée corrélation. Deux variables corrélées
+	signifie que si on connait la valeur d'une variable, alors il est possible d'avoir
+	une indication sur la valeur d'une autre variable
+
+	ERREUR à ne jamais connaitre: il ne faut pas dire qu'il y a un lien de cause à effet 
+	d'une variable sur une l'autre. Il n'y a pas forcément de cause à effet.
+	Il faut effectuer une expérimentation pour vérifier que les variables sont bien corrélées.
+	Si il n'y a pas de lien entre elles on les appelle corrélations fallacieuse
+
+
+Corrélation entre deux variables quantitatives:
+
+	On peut effectuer un diagramme de dispersion pour visualiser la corrélation entre
+	2 variables. Mais lorsqu'on travaille avec des jeux de données comportant de nombreux individus
+	les données sont assez dispersées et nombreuses
+
+	Le diagramme de dispersion permet d'effectuer une représentation plus efficace que le diagramme
+	de dispersion (scatter plot). Il s'agit de plusieurs boite à moustache disposées
+	à la verticale
+
+	EXEMPLE DANS LE NOTEBOOK!!!!!!!!!!!!!!!
+
+	La covariance empirique, similaire à la variance empirique, en la divisant par le produit des 
+	écarts types elle permet de mesurer le coefficient de corrélation (linéaire) de Pearson.
+
+
+	Le coefficient de corrélation de Pearson permet de mesurer la force et le sens d'une 
+	corrélation entre deux variables.
+	Si ce coefficient est proche de -1 ou de 1 alors on peut en déduire qu'il y a une forte
+	corrélation linéaire entre 2 variables.
+	#en Python
+	import scipy.stats as st
+	import numpy as np
+
+	print(st.pearsonr(data["colonne1"], data["colonne2"])[0])
+	print(np.cov(data["colonne1"], data["colonne2"],ddof=0)[1,0])
+
+
+
+Analyse de deux variables quantitatives par régression linéaire:
+
+	Un modèle de régression linéaire est un modèle statistique qui cherche à 
+	établir une relation linéaire entre une variable, dite expliquée, et une ou plusieurs 
+	variables, dites explicatives
+	
+	La régression linaire peut être utilisée pour comprendre les variations d'une variable 
+	mais également à des buts de prédictions. Les variation autour de la moyenne sont plus
+	grandes que les variations autour de la droite de régression.
+
+	La régression linéaire consiste dans le cas de deux variables quantitatives X et Y,
+	à déterminer a et b de sorte à obtenir l'équation Y=a.X+b+ϵ
+	L'objectif est donc de déterminer a et b pour minimiser l'erreur supposée 
+	commise par notre modèle, représentée par ϵ
+	n cherche à ce que la différence entre le yi (qui est la vraie valeur) et le ŷi
+ 	(qui est la valeur prédite par l'équation inexacte ŷ i=a.xi+b) soit minimale.
+	La méthode la plus utilisée pour cela est la méthode des moindres carrés ordinaire (MCO) yi−ŷi
+ 
+
+	Pour faire une estimation de â et b̂ 
+	#en Python
+	import statsmodels.api as sm
+
+	X = data[['colonne1']]
+	Y = data['colonne2']
+
+	X = X.copy() # On modifiera X, on en crée donc une copie
+	X['intercept'] = 1.
+	result = sm.OLS(Y, X).fit() # OLS = Ordinary Least Square (Moindres Carrés Ordinaire)
+	a,b = result.params['colonne1'],result.params['intercept']
+
+	#affichage de la droite
+	plt.plot(data.colonne1,data.colonne2, "o") #affiche le graphique
+
+	#np.arrange crée une liste de nombre allant de 0 à 14, on place cette liste en abscisse
+	#Pour chacune de ces 15 valeurs on calcule les ordonnées grâce à la formule y=ax+b
+	#On crée donc une série de points tous alignés sur la droite d'équation y=ax+b
+	plt.plot(np.arange(15),[a*x+b for x in np.arange(15)])
+	
+	plt.xlabel("Nom_colonne1")
+	plt.ylabel("Nom_colonne2")
+	plt.show()
+
+
+	Le coefficient de détermination noté R2 permet d'évaluer la qualité d'un modèle. Il 
+	représente le pourcentage de variation expliquée de la variable cible par 
+	notre modèle
+	#en Python
+	import numpy
+
+	actual = [1,2,3,4,5]
+	predict = [1,2.5,3,4.9,4.9]
+	corr_matrix = numpy.corrcoef(actual, predict)
+	corr = corr_matrix[0,1]
+	R_sq = corr**2
+	print(R_sq)
+
+
+Analyse d'une variable quantitative et une variable qualitative par ANOVA:
+
+	#on crée le sous-échantillon sur lequel on souhaite travailler
+	X = "colonne1" # qualitative
+	Y = "colonne2" # quantitative
+	
+	#on conditionne suivant ce que l'on souhaite garder
+	sous_echantillon = data[data["colonne2"] < 0].copy()
+	#on conditionne suivant ce que l'on souhaite garder
+	sous_echantillon = sous_echantillon[sous_echantillon["colonne1"] != "ONVEUTPAS"]
+
+	#on affiche le graphique le plus adapté, la boite à moustache
+	modalites = sous_echantillon[X].unique()
+	groupes = []
+	for m in modalites:
+    		groupes.append(sous_echantillon[sous_echantillon[X]==m][Y])
+
+	#Propriétés graphiques (pas très importantes)    
+	medianprops = {'color':"black"}
+	meanprops = {'marker':'o', 'markeredgecolor':'black',
+            'markerfacecolor':'firebrick'}
+    
+	plt.boxplot(groupes, labels=modalites, showfliers=False, medianprops=medianprops, 
+            		vert=False, patch_artist=True, showmeans=True, meanprops=meanprops)
+	plt.show()
+
+
+	On cherche a vérifier si il y a des corrélations
+	On utilise l'analyse de la variance (ANOVA), une méthode 
+	statistique utilisée pour comparer les moyennes de plusieurs groupes et 
+	déterminer s'il existe des différences significatives entre ces groupes
+	On calcul la somme des carrés totale (SCT), la somme des carrés interclasse (SCI)
+	la somme des carrés intraclasse (SCR)
+	
+	Les résultats sont compris entre 0 et 1, 0 signifiant qu'il n'y a pas
+	de corrélation et 1 que la corrélation est maximale, on appelle ça le
+	rapport de corrélation noté  η2 utile pour évaluer numériquement la corrélation.
+	
+	#en Python
+	X = "colonne1" # qualitative
+	Y = "colonne2" # quantitative
+
+	sous_echantillon = data[data["colonne2"] < 0] #on peut conditionner
+
+	def eta_squared(x,y):
+    		moyenne_y = y.mean()
+    		classes = []
+    		for classe in x.unique():
+        		yi_classe = y[x==classe]
+        			classes.append({'ni': len(yi_classe),
+                        		'moyenne_classe': yi_classe.mean()})
+    		SCT = sum([(yj-moyenne_y)**2 for yj in y])
+    		SCE = sum([c['ni']*(c['moyenne_classe']-moyenne_y)**2 for c in classes])
+    		return SCE/SCT
+    
+	eta_squared(sous_echantillon[X],sous_echantillon[Y])
+
+
+Analyse de deux variables qualitatives avec le Chi-2:
+
+	On utilise le tableau de contingence pour analyser la relation entre 
+	2 variables qualitatives
+	L'ensemble effectifs conjoints est appelé distribution conjointe empirique
+	La dernière ligne et la dernière colonne est appelée distribution marginale empirique
+	L'ensemble des effectifs conjoints de chaque ligne est appelé
+	distribution empirique de "Nom de la ligne"	
+
+	#en Python
+	X = "colonne1" #qualitative
+	Y = "colonne2" #qualitative
+
+	cont =
+	data[[X,Y]].pivot_table(index=X,columns=Y,aggfunc=len,margins=True,margins_name="Total")
+	cont
+	
+	
+	On étudie la corrélation entre deux variables qualitative avec une carte de chaleur 
+	ou heatmap
+	Les case font apparaitre la corrélation (non-indépendance) entre les variable de 0 à 1
+	Plus les cases sont foncé plus il y a corrélation
+
+	#en Python
+	import seaborn as sns
+
+	tx = cont.loc[:,["Total"]]
+	ty = cont.loc[["Total"],:]
+	n = len(data)
+	indep = tx.dot(ty) / n
+
+	c = cont.fillna(0) # On remplace les valeurs nulles par 0
+	measure = (c-indep)**2/indep
+	xi_n = measure.sum().sum()
+	table = measure/xi_n
+	sns.heatmap(table.iloc[:-1,:-1],annot=c.iloc[:-1,:-1])
+	plt.show()
+
+
+	Le coefficient de chi2 (χ2) est utilisé pour mesurer la relation entre 
+	deux variables catégorielles. Il est calculé en comparant les fréquences 
+	observées dans un tableau de contingence avec les fréquences attendues 
+	sous l'hypothèse nulle d'indépendance entre les variables.
+	Plus le chi est élevé moins les variables sont indépendantes
+
+	#en python
+	import numpy as np
+	from scipy.stats import chi2_contingency
+
+	#Créer un tableau de contingence
+	observed = np.array([[10, 20, 30],
+                     		[15, 25, 35]])
+
+	# Calculer le coefficient de chi2 et les autres statistiques associées
+	chi2, p_value, dof, expected = chi2_contingency(observed)
+
+	# Afficher les résultats
+	print("Coefficient de chi2 :", chi2)
+	print("P-value :", p_value)
+	print("Degrés de liberté :", dof)
+	print("Fréquences attendues :", expected)
+
+	
+
+	Pour admettre une corrélation de différentes variables on peut également utiliser
+	un niveau de certitude que l'on appelle seuil de significativité, p-value
+	exprimé en pourcentage
+	
+
+
+
+
+
+
+
+
+
+
+
+
+

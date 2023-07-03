@@ -465,18 +465,3 @@ Utilisation de Seaborn, surcouche de Matplotlib :
 	sns.set_theme(style='whitegrid', palette='pastel) #modification du fond du graphique
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
