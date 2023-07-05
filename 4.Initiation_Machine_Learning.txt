@@ -1,0 +1,320 @@
+
+##################
+
+Les différentes étapes de modélisation:
+
+	Un problème d'apprentissage machine comporte différents éléments spécifiques :
+	
+	- les données (données d'entrainement et nouvelles données)
+	bases de données
+	données brutes
+	texte, image, Internet des objets (IoT)
+
+	- la tâche spécifique à accomplir
+	recommandation, identification, prédiction
+
+	- l'algorithme d'apprentissage
+	régression linéaire
+	K-nn
+	Support Vector Machine (SVM)
+	réseaux de neurones
+	random forests
+	
+	- l'analyse d'erreur (ou mesure de performance du modèle)
+	très important, déterminer une mesure spécifique de la tâche à accomplir
+
+
+Apprentissage 'supervisé' ou 'non supervisé':
+
+	Apprentissage supervisé (supervised learning)
+	on récupère des données d'entrées dites annotées ou labellisées pour entrainer un modèle
+	on leur associe un label ou une classe cible et l'algorithme une fois entrainé
+	doit être capable de prédire cette cible sur des nouvelles données non annotées
+	on l'utilise lorsque l'on souhaite annoter précisément pour chaque observation la cible
+	que l'on veut en sortie
+
+
+	Apprentissage non supervisé (unsupervised learning)
+	les données d'entrées ne sont pas annotées ou labellisées
+	l'algorithme d'entrainement trouve seul les similarités et distinctions au sein
+	des données et essaye de regrouper ensemble celles qui partagent des caractéristiques
+	communes
+	on l'utilise lorsqu'on essaye de mieux comprendre notre dataset ou 
+	pour identifier des comportements intéressants
+
+	
+	Il existe également deux autres familles d'algorithmes
+	semi-supervised learning et le reinforcement learning
+
+	Semi-supervised learning
+	il prend en entrée certaines données annotées et d'autre non
+
+	
+	Reinforcement learning
+	il se base sur un cycle d'expérience / récompense et améliore les performances 
+	à chaque itération.
+	On lui donne une récompense à chaque bonne action ce qui pousse l'algorithme à
+	réitérer l'expérience
+
+	
+	Régression ou Classification
+	
+	si la valeur de sortie de notre programme est une valeur continue tel qu'un nombre
+	il s'agira de régression, les données suivent un axe ou une sorte de droite de régression
+	
+	si la valeur de sortie de notre programme est une catégorie on parlera alors de classification
+	les données peuvent être classifiées selon différents groupe 
+
+	
+	Construction d'un modèle statistique
+	Pour construire un modèle, on part d'une hypothèse de départ qui représente 
+	l'ensemble des formes que peut prendre notre modélisation (une courbe 
+	par exemple, mais ça peut être bien d'autres choses encore).
+
+	En apprentissage supervisé, on cherche ensuite à trouver le modèle optimal 
+	à l'aide des données d'entraînement. 
+	Cela consiste à faire converger une mesure appelée loss function (fonction de perte) 
+	en utilisant des techniques d'optimisation numérique.
+	
+	Deux exemples de fonctions de perte souvent utilisées en apprentissage 
+	supervisé sont le risque empirique et le maximum de vraisemblance.
+	
+	
+Programmation d'une régression linéaire:
+	
+	Voir Dossier correspondant
+
+
+Exploitation du jeu de données
+
+	Echantillonnage du jeu de données (sampling)
+	
+	Il faut que l'échantillonnage soit représentatif de toutes les données, il faut éviter
+	le biais car sinon notre modèle devient moins représentatif de la réalité.
+	#en Python
+
+	sample = np.random.randint(data_size, size=int(data_size*0.1) )
+	sampled_data = data.iloc[sample]
+
+	
+	Mettre de côté une partie des données pour tester le modèle
+
+	Il faut séparer dès le départ notre jeu de données en deux parties distincts:
+	- le training set, va nous permettre d'entrainer notre modèle et sera utilisé par l'algorithme
+	d'apprentissage
+	- le testing set, va nous permettre de mesurer l'erreur du modèle final sur les données qu'il 
+	n'a jamais vues.
+
+	En général les données sont séparées ainsi, 80% pour le training set et 20% pour le 
+	testing set
+	#en Python
+	from sklearn.model_selection import train_test_split
+	xtrain, xtest, ytrain, ytest = train_test_split(X, y, train_size=0.8)
+
+
+K-NN:
+
+	K Nearest Neighbors est un algorithme qui consiste à choisir les k données
+	les plus proches du point étudié afin d'en prédire sa valeur
+	Cette algorithme est peu utilisé dans sa forme première car coûteux en puissance de 
+	calcul.
+	Le k-NN n'utilise pas de modèle statistique. Il est non-paramétrique et se base uniquement
+	sur les données d'entrainement. Ce type d'algorithme est appelé memory-based.
+	Le k-NN doit conserver toutes les données d'entrainement en mémoire et donc convient 
+	aux problèmes d'assez petite taille.
+	K n'est pas un paramètres mais un hyperparamètre, contrairement aux paramètres classiques
+	il ne va pas pouvoir être appris automatiquement par l'algorithme à partir des données
+	d'entrainements.
+
+	#en Python dataset de chiffre écris à la main
+	from sklearn.datasets import fetch_openml
+	mnist = fetch_openml('mnist_784', version=1) #le dataset est présent dans sklearn
+
+	#Le dataset principal qui contient toutes les images
+	print (mnist.data.shape)
+
+	#Le vecteur d'annotations associé au dataset (nombre entre 0 et 9)
+	print (mnist.target.shape)
+
+	#on échantillonne
+	import numpy as np
+
+	sample = np.random.randint(70000, size=5000)
+	data = mnist.data.iloc[sample]
+	target = mnist.target.iloc[sample]
+
+	#on sépare le training et le testing set
+	from sklearn.model_selection import train_test_split
+	xtrain, xtest, ytrain, ytest = train_test_split(data, target, train_size=0.8)
+
+	#on importe le modèle d'algorithme k-NN
+	from sklearn import neighbors
+	
+	#on utilise le modèle en lui indiquant le nombre de plus proches voisins
+	model = neighbors.KNeighborsClassifier(n_neighbors=3)
+
+	#on fit lie le modèle à nos données d'entrainements et il va stocker en mémoire ces données
+	model.fit(x_train, y_train)
+
+	#on va tester notre modèle sur une donnée test au hasard
+	model.predict([x_test[3]])
+
+	#on peut faire cette prédiction sur toutes les données de test et pas seulement une donnée
+	#pas sur pas bien expliqué
+	model.score(x_test, y_test)
+
+	#on veut connaitre la performance en pourcentage d'erreur
+	print 1 - model.score(x_test, y_test)
+
+	#on va vérifier la performance du modèle en modifiant l'hyperparamètre plus proche voisin
+	#on essaye les plus proches voisins de 2 à 15
+	errors = []
+	for k in range(2,15):
+    		knn = neighbors.KNeighborsClassifier(k)
+    		errors.append(100*(1 - knn.fit(x_train, y_train).score(x_test, y_test)))
+	plt.plot(range(2,15), errors, 'o-')
+	plt.show()
+
+
+	#on peut afficher les prédictions du classifier sur quelques données pour l'exemple
+	# On récupère le classifieur le plus performant
+	knn = neighbors.KNeighborsClassifier(4)
+	knn.fit(x_train, y_train)
+
+	# On récupère les prédictions sur les données test
+	predicted = knn.predict(x_test)
+
+	# On redimensionne les données sous forme d'images
+	images = x_test.values.reshape((-1, 28, 28))
+
+	# On selectionne un echantillon de 12 images au hasard
+	select = np.random.randint(images.shape[0], size=12)
+
+	# On affiche les images avec la prédiction associée
+	fig,ax = plt.subplots(3,4)
+
+	for index, value in enumerate(select):
+    		plt.subplot(3,4,index+1)
+    		plt.axis('off')
+    		plt.imshow(images[value],cmap=plt.cm.gray_r,interpolation="nearest")
+    		plt.title('Predicted: {}'.format( predicted[value]) )
+
+	plt.show()
+
+
+	#on peut afficher un extrait des prédictions erronées
+	# on récupère les données mal prédites 
+	misclass = (y_test != predicted)
+	misclass_images = images[misclass,:,:]
+	misclass_predicted = predicted[misclass]
+
+	# on sélectionne un échantillon de ces images
+	select = np.random.randint(misclass_images.shape[0], size=12)
+
+	# on affiche les images et les prédictions (erronées) associées à ces images
+	for index, value in enumerate(select):
+    		plt.subplot(3,4,index+1)
+    		plt.axis('off')
+    		plt.imshow(misclass_images[value],cmap=plt.cm.gray_r,interpolation="nearest")
+    		plt.title('Predicted: {}'.format(misclass_predicted[value]) )
+
+	plt.show()
+
+
+Les limites des algorithmes
+
+	Il n'existe pas d'algorithme et modèle ultime applicable pour tous les problèmes
+	Certains algorithmes et modèles sont trop puissant et trop compliqué pour être utilisés
+	On peut effectuer des approximations qui permettront de gagner en efficacité
+	- en réduisant le nombre de variables en entrée
+	- en réduisant la taille du dataset au maximum
+	- en réduisant la complexité des hypothèses de modélisation
+
+
+Trouvez un compromis un compromis entre biais et variance (bias-variance tradeoff)
+
+	La variabilité c'est lorsqu'il y a une dépendance très forte au training set.
+	Il y a une variation très forte de la décision en fonction des données d'entrainement.
+	On souhaite plutôt obtenir un résultat plus stable qui ne dépendra pas autant de notre
+	sélection des données d'entrainement.
+
+	Le biais correspond c'est à quel point on prédit mal la valeur d'une valeur.
+	Le biais dépend de la complexité du modèle choisi, si il est trop simple par rapport 
+	au phénomène que l'on veut modéliser on aura un biais élevé, à contrario en complexifiant
+	notre modèle on diminuera le biais
+
+
+	Pour trouver un bon compromis:
+	
+	On peut réduire les dimensions (nombre de variables en entrée)
+
+	On peut sélectionner et entrainer le bon modèle pour obtenir la complexité optimale 
+	afin de faire la balance entre biais et la variance
+
+	On peut utiliser des méthodes ensemblistes qui se basent sur la combinaison de plusieurs
+	modèles à haute variance et les agrègent (en les moyennant)
+
+
+Généralisation du modèle
+
+	La généralisation du modèle représente la capacité du modèle à effectuer des prédictions sur
+	des données qu'il n'a jamais vues une fois qu'il est correctement entrainé.
+	Le testing set permettra d'évaluer la capacité du modèle à prédire une donnée correctement
+
+
+	L'Overfitting
+	Se traduit par surapprentissage, il désigne le fait que le modèle choisi est trop collé
+	aux données d'entraînement. Cela arrive aux méthodes à hautes variances lorsque la complexité 
+	est trop élevé et prend en compte le bruit du phénomène observé.
+
+
+	L'Underfitting
+	Qui se traduit par sous-apprentissage, désigne une situation ou le modèle n'est pas 
+	assez complexe pour capturer le phénomène dans son intégralité
+	Cela se produit sur les algorithmes avec un biais élevé, ils omettent des informations importantes
+	sur le phénomène
+
+
+	On peut éviter ces phénomènes en sélectionnant correctement le modèle de départ,
+	en choisissant la bonne manière d'entrainer le modèle et en utilisant des méthodes ensemblistes
+
+
+
+Le fléau de la dimension (curse of dimensionality)
+	
+	C'est une problématique majeure qui apparaît lorsqu'on se retrouve avec un grand nombre de 
+	features (variables) par rapport au nombre d'observations.
+
+	Plus le nombres de features augmentent plus l'algorithme aura besoin d'exemple pour
+	pouvoir apprendre correctement le phénomène. 
+	Plus le nombre de features plus le nombre de dimension augmente
+
+	Pour résoudre ce problème il faut réduire le nombre de features, de dimensions.
+	On cherche les dimensions principales d'un phénomène qui ne sont pas forcément celles qu'on
+	observe directement mais peuvent être une combinasse linaire de celles-ci
+	On peut la variété sous-jacente (manifold), un objet mathématiquement qui représente une surface
+	topologique de dimension inférieure au problème de grande dimension traité
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
